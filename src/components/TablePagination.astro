@@ -1,0 +1,100 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  onPageChange?: (page: number) => void;
+}
+
+const { currentPage = 1, totalPages = 1 } = Astro.props;
+---
+
+<div class="flex items-center justify-between px-4 py-3 border-t dark:border-gray-700">
+  <div class="flex items-center">
+    <span class="text-sm text-gray-700 dark:text-gray-400">
+      Showing page <span class="font-semibold">{currentPage}</span> of <span class="font-semibold">{totalPages}</span>
+    </span>
+  </div>
+  <div class="flex items-center space-x-2">
+    <button
+      class="pagination-btn px-3 py-1 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      data-action="prev"
+      disabled={currentPage === 1}
+    >
+      Previous
+    </button>
+    <div class="flex items-center space-x-1">
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        <button
+          class={`pagination-btn w-8 h-8 rounded-md border dark:border-gray-600 ${
+            page === currentPage
+              ? 'bg-blue-500 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+          }`}
+          data-page={page}
+        >
+          {page}
+        </button>
+      ))}
+    </div>
+    <button
+      class="pagination-btn px-3 py-1 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      data-action="next"
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
+</div>
+
+<script>
+  let currentPage = 1;
+  const itemsPerPage = 5;
+  const rows = Array.from(document.querySelectorAll('#transactionsTable tbody tr'));
+  const totalPages = Math.ceil(rows.length / itemsPerPage);
+
+  function updateTable(page: number) {
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+
+    rows.forEach((row, index) => {
+      row.style.display = (index >= start && index < end) ? '' : 'none';
+    });
+  }
+
+  function updatePaginationState(page: number) {
+    document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+      const btnPage = parseInt((btn as HTMLElement).dataset.page || '1');
+      btn.classList.toggle('bg-blue-500', btnPage === page);
+      btn.classList.toggle('text-white', btnPage === page);
+      btn.classList.toggle('bg-white', btnPage !== page);
+      btn.classList.toggle('dark:bg-gray-800', btnPage !== page);
+    });
+
+    const prevBtn = document.querySelector('.pagination-btn[data-action="prev"]');
+    const nextBtn = document.querySelector('.pagination-btn[data-action="next"]');
+    
+    if (prevBtn) prevBtn.toggleAttribute('disabled', page === 1);
+    if (nextBtn) nextBtn.toggleAttribute('disabled', page === totalPages);
+  }
+
+  // Initialize pagination
+  updateTable(currentPage);
+
+  // Add event listeners
+  document.querySelectorAll('.pagination-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLElement;
+      
+      if (target.dataset.page) {
+        currentPage = parseInt(target.dataset.page);
+      } else if (target.dataset.action === 'prev' && currentPage > 1) {
+        currentPage--;
+      } else if (target.dataset.action === 'next' && currentPage < totalPages) {
+        currentPage++;
+      }
+
+      updateTable(currentPage);
+      updatePaginationState(currentPage);
+    });
+  });
+</script>

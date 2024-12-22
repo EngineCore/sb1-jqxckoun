@@ -1,0 +1,116 @@
+---
+const users = [
+  {
+    id: '1',
+    name: 'Chandler Jacobi',
+    role: 'Direct Security Executive',
+    amount: '$ 989.4',
+    status: 'primary',
+    date: '03/02/2020'
+  },
+  {
+    id: '2',
+    name: 'Monserrat Marquardt',
+    role: 'Forward Accountability Producer',
+    amount: '$ 471.44',
+    status: 'danger',
+    date: '29/11/2019'
+  },
+  {
+    id: '3',
+    name: 'Lonie Wyman',
+    role: 'Legacy Program Director',
+    amount: '$ 934.24',
+    status: 'success',
+    date: '03/04/2020'
+  },
+  {
+    id: '4',
+    name: 'Corine Abernathy',
+    role: 'Chief Factors Planner',
+    amount: '$ 351.28',
+    status: 'warning',
+    date: '22/06/2019'
+  },
+  {
+    id: '5',
+    name: 'Sam Abernathy',
+    role: 'Chief Factors Planner',
+    amount: '$ 351.28',
+    status: 'warning',
+    date: '22/06/2019'
+  },
+   {
+    id: '7',
+    name: 'Jom Abernathy',
+    role: 'Chief Factors Planner',
+    amount: '$ 351.28',
+    status: 'warning',
+    date: '22/06/2019'
+  },
+];
+
+const getStatusColor = (status: string) => {
+  const colors = {
+    primary: 'bg-blue-100 text-blue-800',
+    danger: 'bg-red-100 text-red-800',
+    success: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+  };
+  return colors[status] || 'bg-gray-100 text-gray-800';
+};
+
+import TableCheckbox from './TableCheckbox.astro';
+import TableActions from './TableActions.astro';
+import TablePagination from './TablePagination.astro';
+
+const itemsPerPage = 5;
+const totalPages = Math.ceil(users.length / itemsPerPage);
+---
+
+<div class="w-full overflow-hidden rounded-lg shadow-md">
+  <div class="w-full overflow-x-auto">
+    <table id="transactionsTable" class="w-full whitespace-nowrap">
+      <thead>
+        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+          <th class="px-4 py-3">
+            <TableCheckbox id="select-all" label="Select all" />
+          </th>
+          <th class="px-4 py-3">Client</th>
+          <th class="px-4 py-3">Amount</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Date</th>
+          <th class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+        {users.map((user) => (
+          <tr class="text-gray-700 dark:text-gray-400">
+            <td class="px-4 py-3">
+              <TableCheckbox id={`select-${user.id}`} label={`Select ${user.name}`} />
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center text-sm">
+                <div>
+                  <p class="font-semibold">{user.name}</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">{user.role}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-sm">{user.amount}</td>
+            <td class="px-4 py-3 text-xs">
+              <span class={`px-2 py-1 font-semibold leading-tight rounded-full ${getStatusColor(user.status)}`}>
+                {user.status}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm">{user.date}</td>
+            <td class="px-4 py-3">
+              <TableActions id={user.id} />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <TablePagination currentPage={1} totalPages={totalPages} />
+</div>
